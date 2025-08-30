@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Camera, Upload, User, Phone, IdCard, MessageSquare } from 'lucide-react';
+import { Camera, Upload, User, Phone, IdCard, MessageSquare, Loader2 } from 'lucide-react';
 
 interface VisitorData {
   name: string;
@@ -109,18 +109,23 @@ const VisitorForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl flex items-center justify-center gap-2">
-          <User className="h-6 w-6" />
+    <Card className="w-full max-w-2xl mx-auto shadow-lg">
+      <CardHeader className="text-center px-4 sm:px-6 py-4 sm:py-6">
+        <div className="flex items-center justify-center gap-2 mb-2 sm:mb-4">
+          <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+        </div>
+        <CardTitle className="text-xl sm:text-2xl lg:text-3xl">
           Visitor Registration
         </CardTitle>
-        <p className="text-muted-foreground">Please fill in your details to register your visit</p>
+        <p className="text-sm sm:text-base text-muted-foreground px-2">
+          Please fill in your details to register your visit
+        </p>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          {/* Full Name */}
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium">
+            <Label htmlFor="name" className="text-sm sm:text-base font-medium">
               Full Name *
             </Label>
             <Input
@@ -130,12 +135,13 @@ const VisitorForm = () => {
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               required
-              className="w-full"
+              className="w-full h-11 sm:h-12 text-base"
             />
           </div>
 
+          {/* Contact Number */}
           <div className="space-y-2">
-            <Label htmlFor="contact" className="text-sm font-medium flex items-center gap-2">
+            <Label htmlFor="contact" className="text-sm sm:text-base font-medium flex items-center gap-2">
               <Phone className="h-4 w-4" />
               Contact Number *
             </Label>
@@ -146,18 +152,19 @@ const VisitorForm = () => {
               value={formData.contact}
               onChange={(e) => handleInputChange('contact', e.target.value)}
               required
-              className="w-full"
+              className="w-full h-11 sm:h-12 text-base"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* ID Type and Number - Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="idType" className="text-sm font-medium flex items-center gap-2">
+              <Label htmlFor="idType" className="text-sm sm:text-base font-medium flex items-center gap-2">
                 <IdCard className="h-4 w-4" />
                 ID Type *
               </Label>
               <Select value={formData.idType} onValueChange={(value) => handleInputChange('idType', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11 sm:h-12 text-base">
                   <SelectValue placeholder="Select ID type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -171,7 +178,7 @@ const VisitorForm = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="idNumber" className="text-sm font-medium">
+              <Label htmlFor="idNumber" className="text-sm sm:text-base font-medium">
                 ID Number
               </Label>
               <Input
@@ -180,13 +187,14 @@ const VisitorForm = () => {
                 placeholder="Enter ID number"
                 value={formData.idNumber}
                 onChange={(e) => handleInputChange('idNumber', e.target.value)}
-                className="w-full"
+                className="w-full h-11 sm:h-12 text-base"
               />
             </div>
           </div>
 
+          {/* Purpose of Visit */}
           <div className="space-y-2">
-            <Label htmlFor="visitPurpose" className="text-sm font-medium flex items-center gap-2">
+            <Label htmlFor="visitPurpose" className="text-sm sm:text-base font-medium flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Purpose of Visit *
             </Label>
@@ -196,39 +204,48 @@ const VisitorForm = () => {
               value={formData.visitPurpose}
               onChange={(e) => handleInputChange('visitPurpose', e.target.value)}
               required
-              className="min-h-[100px] resize-none"
+              className="min-h-[100px] sm:min-h-[120px] resize-none text-base"
             />
           </div>
 
+          {/* Photo Section - Responsive Layout */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Photo (Optional)</Label>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <Label className="text-sm sm:text-base font-medium">Photo (Optional)</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handlePhotoCapture}
-                className="flex items-center gap-2 flex-1"
+                className="flex items-center justify-center gap-2 h-11 sm:h-12 text-base"
               >
-                <Camera className="h-4 w-4" />
+                <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
                 Take Photo
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                className="flex items-center gap-2 flex-1"
+                className="flex items-center justify-center gap-2 h-11 sm:h-12 text-base"
               >
-                <Upload className="h-4 w-4" />
+                <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
                 Upload Photo
               </Button>
             </div>
           </div>
 
+          {/* Submit Button - Large and Touch-Friendly */}
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-6 text-lg font-medium"
+            className="w-full h-12 sm:h-14 text-base sm:text-lg font-medium mt-6 sm:mt-8"
           >
-            {isSubmitting ? 'Registering...' : 'Complete Registration'}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin mr-2" />
+                Registering...
+              </>
+            ) : (
+              'Complete Registration'
+            )}
           </Button>
         </form>
       </CardContent>
