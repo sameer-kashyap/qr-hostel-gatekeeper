@@ -1,75 +1,93 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Download, Trash2, Users, Clock, TrendingUp } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Download, Trash2, Users, Clock, TrendingUp, Loader2 } from 'lucide-react';
 
 interface Visitor {
   id: string;
-  fullName: string;
-  contactNumber: string;
-  idType: string;
-  purpose: string;
-  checkInTime: string;
-  status: 'active' | 'checked-out';
+  name: string;
+  contact: string;
+  id_proof: string;
+  visit_purpose: string;
+  check_in_time: string;
+  status: string;
+  created_at?: string;
 }
 
-// Mock data for demonstration
-const mockVisitors: Visitor[] = [
-  {
-    id: '1',
-    fullName: 'John Doe',
-    contactNumber: '+91 9876543210',
-    idType: 'Aadhaar Card',
-    purpose: 'Meeting with resident',
-    checkInTime: '2024-01-15 10:30 AM',
-    status: 'active'
-  },
-  {
-    id: '2',
-    fullName: 'Jane Smith',
-    contactNumber: '+91 9876543211',
-    idType: 'Driving License',
-    purpose: 'Delivery',
-    checkInTime: '2024-01-15 09:15 AM',
-    status: 'checked-out'
-  },
-  {
-    id: '3',
-    fullName: 'Mike Johnson',
-    contactNumber: '+91 9876543212',
-    idType: 'Passport',
-    purpose: 'Property viewing',
-    checkInTime: '2024-01-15 11:45 AM',
-    status: 'active'
-  }
-];
-
 const AdminDashboard = () => {
-  const [visitors, setVisitors] = useState<Visitor[]>(mockVisitors);
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const handleDeleteVisitor = (visitorId: string) => {
-    setVisitors(prev => prev.filter(v => v.id !== visitorId));
-    toast({
-      title: "Visitor Deleted",
-      description: "Visitor entry has been removed from the system.",
-    });
+  useEffect(() => {
+    fetchVisitors();
+  }, []);
+
+  const fetchVisitors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('visitors')
+        .select('*')
+        .order('check_in_time', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      setVisitors(data || []);
+    } catch (error) {
+      console.error('Error fetching visitors:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load visitor data.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteVisitor = async (visitorId: string) => {
+    try {
+      const { error } = await supabase
+        .from('visitors')
+        .delete()
+        .eq('id', visitorId);
+
+      if (error) {
+        throw error;
+      }
+
+      setVisitors(prev => prev.filter(v => v.id !== visitorId));
+      toast({
+        title: "Visitor Deleted",
+        description: "Visitor entry has been removed from the system.",
+      });
+    } catch (error) {
+      console.error('Error deleting visitor:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete visitor entry.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleExportData = () => {
     // Create CSV content
     const csvContent = [
-      ['Name', 'Contact', 'ID Type', 'Purpose', 'Check-in Time', 'Status'],
+      ['Name', 'Contact', 'ID Proof', 'Purpose', 'Check-in Time', 'Status'],
       ...visitors.map(v => [
-        v.fullName,
-        v.contactNumber,
-        v.idType,
-        v.purpose,
-        v.checkInTime,
+        v.name,
+        v.contact,
+        v.id_proof || '',
+        v.visit_purpose,
+        new Date(v.check_in_time).toLocaleString(),
         v.status
       ])
     ].map(row => row.join(',')).join('\n');
@@ -91,6 +109,15 @@ const AdminDashboard = () => {
 
   const activeVisitors = visitors.filter(v => v.status === 'active').length;
   const totalVisitors = visitors.length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-lg">Loading visitor data...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -149,7 +176,7 @@ const AdminDashboard = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead className="hidden sm:table-cell">Contact</TableHead>
-                  <TableHead className="hidden md:table-cell">ID Type</TableHead>
+                  <TableHead className="hidden md:table-cell">ID Proof</TableHead>
                   <TableHead>Purpose</TableHead>
                   <TableHead className="hidden lg:table-cell">Check-in Time</TableHead>
                   <TableHead>Status</TableHead>
@@ -157,53 +184,63 @@ const AdminDashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {visitors.map((visitor) => (
-                  <TableRow key={visitor.id}>
-                    <TableCell className="font-medium">{visitor.fullName}</TableCell>
-                    <TableCell className="hidden sm:table-cell">{visitor.contactNumber}</TableCell>
-                    <TableCell className="hidden md:table-cell">{visitor.idType}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{visitor.purpose}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{visitor.checkInTime}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={visitor.status === 'active' ? 'default' : 'secondary'}
-                        className={visitor.status === 'active' ? 'bg-success text-success-foreground' : ''}
-                      >
-                        {visitor.status === 'active' ? 'Active' : 'Checked Out'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Visitor Entry</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete {visitor.fullName}'s entry? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteVisitor(visitor.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                {visitors.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      No visitors registered yet
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  visitors.map((visitor) => (
+                    <TableRow key={visitor.id}>
+                      <TableCell className="font-medium">{visitor.name}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{visitor.contact}</TableCell>
+                      <TableCell className="hidden md:table-cell">{visitor.id_proof || 'N/A'}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{visitor.visit_purpose}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        {new Date(visitor.check_in_time).toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={visitor.status === 'active' ? 'default' : 'secondary'}
+                          className={visitor.status === 'active' ? 'bg-success text-success-foreground' : ''}
+                        >
+                          {visitor.status === 'active' ? 'Active' : visitor.status === 'checked-out' ? 'Checked Out' : visitor.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Visitor Entry</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete {visitor.name}'s entry? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteVisitor(visitor.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

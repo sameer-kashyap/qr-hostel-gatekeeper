@@ -1,35 +1,13 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import QRCodeDisplay from '@/components/QRCodeDisplay';
-import { Building2, Users, Shield, Smartphone, Database, Download } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import { Users, Shield, Smartphone, Database, Download } from 'lucide-react';
 
 const Index = () => {
-  const visitorFormUrl = `${window.location.origin}/visitor-entry`;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
-      {/* Header */}
-      <header className="bg-card/80 backdrop-blur-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Building2 className="h-8 w-8 text-primary" />
-              <div>
-                <h1 className="text-xl font-bold text-foreground">HostelGuard</h1>
-                <p className="text-sm text-muted-foreground">Visitor Management System</p>
-              </div>
-            </div>
-            <Link to="/admin">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                Admin Panel
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 py-12">
         {/* Hero Section */}
@@ -40,18 +18,18 @@ const Index = () => {
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Streamline your hostel's visitor registration with our modern, mobile-friendly system. 
-            One QR code, instant registration, complete security.
+            Simple navigation, instant registration, complete security.
           </p>
         </div>
 
-        {/* QR Code Section */}
+        {/* Quick Access Section */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           <div className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-3xl font-bold text-foreground">Quick Access QR Code</h3>
+              <h3 className="text-3xl font-bold text-foreground">Easy Access Navigation</h3>
               <p className="text-lg text-muted-foreground">
-                Display this QR code at your entrance. Visitors can scan it with any smartphone 
-                to instantly access the registration form.
+                Use the navigation bar above to quickly access the visitor form or admin panel. 
+                No QR codes needed - just simple, direct access.
               </p>
             </div>
             
@@ -62,7 +40,7 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-3 text-foreground">
                 <Database className="h-5 w-5 text-primary" />
-                <span>Secure data storage</span>
+                <span>Secure database storage</span>
               </div>
               <div className="flex items-center gap-3 text-foreground">
                 <Download className="h-5 w-5 text-primary" />
@@ -72,13 +50,21 @@ const Index = () => {
 
             <Link to="/visitor-entry">
               <Button size="lg" className="text-lg px-8 py-6">
-                Test Registration Form
+                Access Visitor Form
               </Button>
             </Link>
           </div>
 
           <div className="flex justify-center">
-            <QRCodeDisplay value={visitorFormUrl} size={320} />
+            <Card className="w-full max-w-md p-8 text-center">
+              <CardContent className="space-y-4">
+                <Users className="h-16 w-16 text-primary mx-auto" />
+                <h3 className="text-2xl font-bold">Quick Registration</h3>
+                <p className="text-muted-foreground">
+                  Visitors can register in under 60 seconds with automatic timestamp recording.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -127,17 +113,17 @@ const Index = () => {
             Ready to Get Started?
           </h3>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Print the QR code above and place it at your entrance, or access the admin panel to view visitor data.
+            Use the navigation above to access the visitor form or admin panel to manage visitor data.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/admin">
+            <Link to="/auth">
               <Button size="lg" variant="outline" className="text-lg px-8">
-                Access Admin Panel
+                Admin Login
               </Button>
             </Link>
             <Link to="/visitor-entry">
               <Button size="lg" className="text-lg px-8">
-                Try Registration
+                Visitor Registration
               </Button>
             </Link>
           </div>

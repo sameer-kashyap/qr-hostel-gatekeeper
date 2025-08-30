@@ -14,29 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       visitors: {
         Row: {
+          check_in_time: string | null
           contact: string
           created_at: string | null
           id: string
           id_proof: string | null
           name: string
+          status: string | null
           visit_purpose: string | null
         }
         Insert: {
+          check_in_time?: string | null
           contact: string
           created_at?: string | null
           id?: string
           id_proof?: string | null
           name: string
+          status?: string | null
           visit_purpose?: string | null
         }
         Update: {
+          check_in_time?: string | null
           contact?: string
           created_at?: string | null
           id?: string
           id_proof?: string | null
           name?: string
+          status?: string | null
           visit_purpose?: string | null
         }
         Relationships: []

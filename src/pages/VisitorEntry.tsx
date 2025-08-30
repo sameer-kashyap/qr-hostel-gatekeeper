@@ -1,20 +1,11 @@
 import VisitorForm from '@/components/VisitorForm';
-import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import Navbar from '@/components/Navbar';
 
 const VisitorEntry = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 p-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <Link to="/">
-            <Button variant="outline" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Home
-            </Button>
-          </Link>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
+      <Navbar />
+      <div className="max-w-4xl mx-auto p-4 space-y-8">
         
         <div className="text-center space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">

@@ -1,20 +1,13 @@
 import AdminDashboard from '@/components/AdminDashboard';
-import { ArrowLeft, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import Navbar from '@/components/Navbar';
+import { Shield } from 'lucide-react';
 
 const AdminPanel = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 p-4">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <Link to="/">
-            <Button variant="outline" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Home
-            </Button>
-          </Link>
-          
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
+      <Navbar />
+      <div className="max-w-7xl mx-auto p-4 space-y-8">
+        <div className="flex items-center justify-center">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Shield className="h-4 w-4" />
             Admin Access
